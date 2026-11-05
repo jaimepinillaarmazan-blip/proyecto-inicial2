@@ -1,57 +1,52 @@
 /* Reset básico para que se vea igual en todos los navegadores */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* --- ESTILOS GENERALES --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background-color: #0f172a; 
+    background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+    margin: 0;
+    color: #f8fafc;
 }
 
+/* --- CABECERA (Estilo App) --- */
 header {
+    background: linear-gradient(135deg, #004d99, #002244); /* Degradado con el azul USM */
+    color: white;
+    padding: 20px 15px;
     text-align: center;
-    margin-bottom: 25px;
-    max-width: 800px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 header h1 {
-    color: #004d99; /* Un azul formal para la plataforma */
-    margin-bottom: 10px;
+    margin: 0;
+    font-size: 1.8em;
+    letter-spacing: 0.5px;
 }
 
 header p {
-    font-size: 1.1em;
-    color: #555;
+    margin: 8px 0 0 0;
+    font-size: 0.95em;
+    color: #e0eaf5; /* Texto secundario ligeramente más claro */
 }
 
-/* 
-  ESTA ES LA PARTE MÁS IMPORTANTE
-  Leaflet requiere dimensiones exactas para renderizar el mapa
-*/
-#mapa-usm {
-    height: 70vh; /* Ocupa el 70% del alto de la pantalla */
-    min-height: 400px;
-    width: 100%;
-    max-width: 1000px; /* Limita el ancho en pantallas de computador */
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Sombra para darle profundidad */
-    border: 2px solid #e0e0e0;
-
-}
-/* Reemplaza tu regla "main" anterior por esta: */
+/* --- CONTENEDOR PRINCIPAL --- */
 main {
-    width: 100%;
+    width: 95%;
+    max-width: 1000px;
+    margin: 30px auto; /* Centra el contenido y deja espacio con la cabecera */
     display: flex;
-    flex-direction: column; /* Apila el mapa arriba y el botón abajo */
+    flex-direction: column;
     align-items: center;
-    gap: 20px; /* Añade una separación limpia entre el mapa y el botón */
+    gap: 25px;
+}
+
+/* --- MAPA --- */
+#mapa-usm {
+    width: 100%;
+    height: 65vh; /* Ocupa el 65% de la altura de la pantalla */
+    border-radius: 12px; /* Esquinas redondeadas modernas */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra para efecto flotante */
+    border: 3px solid white; /* Borde blanco para enmarcar el mapa */
 }
 
 /* Agrega esto al final del archivo: */
@@ -73,3 +68,47 @@ main {
     background-color: #003366; /* Un azul levemente más oscuro */
     transform: translateY(-2px); /* Pequeño salto visual */
 }
+
+/* --- ESTILOS DEL FORMULARIO EMERGENTE --- */
+#modal-reporte {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que flote sobre el mapa de Leaflet */
+}
+
+/* Clase para ocultar el modal con JavaScript */
+.oculto {
+    display: none !important;
+}
+
+/* Caja blanca central */
+.modal-contenido {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-contenido h2 { color: #004d99; text-align: center; font-size: 1.5em; }
+.modal-contenido label { font-weight: bold; font-size: 0.9em; color: #333; }
+.modal-contenido select, .modal-contenido textarea {
+    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;
+}
+
+.modal-botones { display: flex; justify-content: space-between; margin-top: 10px; }
+.btn-principal { background-color: #004d99; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-secundario { background-color: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-principal:hover { background-color: #003366; }
+.btn-secundario:hover { background-color: #bbb; }

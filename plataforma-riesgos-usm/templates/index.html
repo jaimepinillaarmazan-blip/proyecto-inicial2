@@ -8,74 +8,59 @@
     <!-- Cargamos los estilos de Leaflet para el mapa -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-    <!-- Bootstrap CSS para darle estilo rápido a los modales y botones -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
     <!-- Conectamos nuestro propio archivo de estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body>
 
-    <header class="p-3 bg-dark text-white text-center">
+    <header>
         <h1>Plataforma de Riesgos Urbanos - Casa Central USM</h1>
-        <p class="m-0">Reporta y visualiza obstáculos o incidentes en los alrededores de la universidad.</p>
+        <p>Reporta y visualiza obstáculos o incidentes en los alrededores de la universidad.</p>
     </header>
 
-    <main class="container my-4">
+    <main>
         <!-- Este es el contenedor donde aparecerá el mapa interactivo -->
-        <div id="mapa-usm" style="height: 400px;" class="mb-3 rounded shadow"></div>
+        <div id="mapa-usm"></div>
         
-        <!-- Botón para reportar alertas conectado a Bootstrap Modal -->
-        <div class="text-center">
-            <button id="btn-reportar" class="btn btn-danger btn-lg shadow" data-bs-toggle="modal" data-bs-target="#modalReporte">
-                 Reportar Nuevo Incidente
-            </button>
-        </div>
+        <!-- Botón para reportar alertas -->
+        <button id="btn-reportar">Reportar Nuevo Incidente</button>
     </main>
 
-    <!-- VENTANA MODAL (Formulario flotante tipo Waze) -->
-    <div class="modal fade" id="modalReporte" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Nuevo Reporte - USM</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="formReporte">
-              <div class="mb-3">
-                <label class="form-label fw-bold">¿Qué está pasando?</label>
-                <div class="d-flex flex-wrap gap-2" id="grupoCategorias">
-                  <button type="button" class="btn btn-outline-danger cat-btn flex-fill" data-val="Bache">🕳️ Bache</button>
-                  <button type="button" class="btn btn-outline-warning cat-btn flex-fill" data-val="Luminaria">💡 Luminaria</button>
-                  <button type="button" class="btn btn-outline-secondary cat-btn flex-fill" data-val="Basura">🗑️ Basura</button>
-                  <button type="button" class="btn btn-outline-primary cat-btn flex-fill" data-val="Otro">⚠️ Otro</button>
-                </div>
-                <!-- Campo oculto que guarda la categoría elegida -->
-                <input type="hidden" id="categoriaSeleccionada">
-              </div>
+    <!-- Contenedor del formulario emergente (Debe ir ANTES de los scripts) -->
+    <div id="modal-reporte" class="oculto">
+        <div class="modal-contenido">
+            <h2>Detalles del Incidente</h2>
+            
+            <label for="tipo-incidente">Tipo de problema:</label>
+            <select id="tipo-incidente">
+                <option value="Obstáculo en vía">Obstáculo en la vía</option>
+                <option value="Problema de Iluminación">Problema de Iluminación</option>
+                <option value="Actividad Sospechosa">Actividad Sospechosa</option>
+                <option value="Daño en Infraestructura">Daño en Infraestructura</option>
+            </select>
 
-              <div class="mb-3">
-                <label for="descripcion" class="form-label fw-bold">Detalle breve (Opcional)</label>
-                <input type="text" class="form-control" id="descripcion" placeholder="Ej: Calle bloqueada cerca de la entrada principal">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-primary" id="btnEnviarReporte">Enviar Reporte</button>
-          </div>
+            <label for="desc-incidente">Descripción breve:</label>
+            <textarea id="desc-incidente" rows="3" placeholder="Ej: Escalones sueltos cerca de la entrada..."></textarea>
+
+            <label for="duracion-incidente">¿Cuánto tiempo estará activo?</label>
+            <select id="duracion-incidente">
+                <option value="1">1 Hora</option>
+                <option value="6">6 Horas</option>
+                <option value="12">12 Horas</option>
+                <option value="24">24 Horas</option>
+            </select>
+
+            <div class="modal-botones">
+                <button id="btn-cancelar" class="btn-secundario">Cancelar</button>
+                <button id="btn-enviar" class="btn-principal">Guardar Reporte</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Cargamos la lógica de Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
-    <!-- Bootstrap JS (necesario para que funcione el modal) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Conectamos nuestro propio archivo JavaScript (puedes meter la lógica del paso 2 aquí adentro) -->
+    <!-- Conectamos nuestro propio archivo JavaScript al final -->
     <script src="{{ url_for('static', filename='js/mapa.js') }}"></script>
 
 </body>

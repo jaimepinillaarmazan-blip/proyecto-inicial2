@@ -17,17 +17,29 @@ async function cargarReportes() {
         const respuesta = await fetch('/api/reportes');
         const reportes = await respuesta.json();
 
-        // Dibujar cada reporte en el mapa
+        const contenedorLista = document.getElementById('lista-reportes');
+        contenedorLista.innerHTML = ''; // Limpiamos la lista antes de actualizar
+
+        // Dibujar cada reporte en el mapa y en el dashboard
         reportes.forEach(reporte => {
+            // Pin en el mapa
             let marcador = L.marker([reporte.latitud, reporte.longitud]).addTo(mapa);
-            
-            // La ventana que se abre al hacer clic en un reporte guardado
             marcador.bindPopup(`
                 <b style="color: #004d99;">${reporte.tipo}</b><br>
                 ${reporte.descripcion}<br>
                 <hr style="margin: 5px 0;">
                 <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
             `);
+
+            // Tarjeta en el dashboard
+            let tarjeta = document.createElement('div');
+            tarjeta.className = 'tarjeta-reporte';
+            tarjeta.innerHTML = `
+                <h4>${reporte.tipo}</h4>
+                <p>${reporte.descripcion}</p>
+                <small>Duración: ${reporte.duracion_horas} Hora(s)</small>
+            `;
+            contenedorLista.appendChild(tarjeta);
         });
     } catch (error) {
         console.error("Error al cargar los reportes:", error);
@@ -112,5 +124,17 @@ btnEnviar.addEventListener('click', async function() {
     }
 });
 
-// 6. Cargar los reportes al abrir la página
+
 cargarReportes();
+// 6. Lógica del Dashboard Lateral
+const dashboard = document.getElementById('dashboard-lateral');
+const btnAbrirDashboard = document.getElementById('btn-abrir-dashboard');
+const btnCerrarDashboard = document.getElementById('btn-cerrar-dashboard');
+
+btnAbrirDashboard.addEventListener('click', () => {
+    dashboard.classList.add('abierto');
+});
+
+btnCerrarDashboard.addEventListener('click', () => {
+    dashboard.classList.remove('abierto');
+});

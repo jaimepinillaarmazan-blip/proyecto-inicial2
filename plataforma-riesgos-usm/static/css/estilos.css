@@ -112,3 +112,53 @@ main {
 .btn-secundario { background-color: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-principal:hover { background-color: #003366; }
 .btn-secundario:hover { background-color: #bbb; }
+/* --- DASHBOARD LATERAL --- */
+#dashboard-lateral {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Empieza oculto fuera de la pantalla */
+    width: 350px;
+    max-width: 100%;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.3);
+    transition: right 0.3s ease; /* Animación de deslizamiento */
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+}
+
+#dashboard-lateral.abierto {
+    right: 0; /* Al agregar esta clase con JS, el panel entra a la pantalla */
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, #004d99, #002244);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h3 { margin: 0; font-size: 1.2em; }
+#btn-cerrar-dashboard { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
+
+#lista-reportes {
+    padding: 20px;
+    overflow-y: auto; /* Permite hacer scroll si hay muchos reportes */
+    flex-grow: 1;
+}
+
+/* Diseño de cada reporte en la lista */
+.tarjeta-reporte {
+    background-color: #f8fafc;
+    border-left: 5px solid #004d99;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.tarjeta-reporte h4 { margin: 0 0 8px 0; color: #004d99; }
+.tarjeta-reporte p { margin: 0 0 10px 0; font-size: 0.9em; color: #333; }
+.tarjeta-reporte small { color: #666; font-size: 0.8em; font-weight: bold; }

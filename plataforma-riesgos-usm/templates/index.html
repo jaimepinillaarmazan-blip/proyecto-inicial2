@@ -22,9 +22,23 @@
         <!-- Este es el contenedor donde aparecerá el mapa interactivo -->
         <div id="mapa-usm"></div>
         
-        <!-- Botón para reportar alertas -->
-        <button id="btn-reportar">Reportar Nuevo Incidente</button>
+        <!-- Botones debajo del mapa -->
+        <div style="display: flex; gap: 15px; margin-top: 10px;">
+            <button id="btn-reportar" class="btn-principal">Reportar Nuevo Incidente</button>
+            <button id="btn-abrir-dashboard" class="btn-secundario">Ver Últimos 25 Reportes</button>
+        </div>
     </main>
+
+    <!-- Dashboard Lateral Desplegable -->
+    <div id="dashboard-lateral">
+        <div class="dashboard-header">
+            <h3>Últimos Reportes</h3>
+            <button id="btn-cerrar-dashboard">✖</button>
+        </div>
+        <div id="lista-reportes">
+            <!-- JavaScript inyectará las tarjetas de reportes aquí -->
+        </div>
+    </div>
 
     <!-- Contenedor del formulario emergente (Debe ir ANTES de los scripts) -->
     <div id="modal-reporte" class="oculto">

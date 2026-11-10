@@ -40,7 +40,7 @@ def inicio():
 def obtener_reportes():
     conn = obtener_conexion()
     # Aquí obtenemos todos los reportes de la base de datos
-    reportes_bd = conn.execute('SELECT * FROM reportes').fetchall()
+    reportes_bd = conn.execute('SELECT * FROM reportes ORDER BY fecha_creacion DESC LIMIT 25').fetchall()
     conn.close()
     
     # Convertimos los datos a un formato que JavaScript pueda leer (JSON)

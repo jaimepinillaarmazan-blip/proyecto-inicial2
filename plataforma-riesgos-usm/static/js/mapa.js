@@ -16,6 +16,7 @@ var marcadorTemporal = null;
 var coordenadasSeleccionadas = null;
 
 // 3. Función para descargar los reportes de SQLite y dibujarlos
+// 3. Función para descargar los reportes de SQLite y dibujarlos
 async function cargarReportes() {
     try {
         const respuesta = await fetch('/api/reportes');
@@ -24,60 +25,46 @@ async function cargarReportes() {
         const contenedorLista = document.getElementById('lista-reportes');
         contenedorLista.innerHTML = ''; // Limpiamos la lista antes de actualizar
 
-        // Dibujar cada reporte en el mapa y en el dashboard
         reportes.forEach(reporte => {
-            
-            // 🎨 SELECCIONAR COLOR DEL PIN SEGÚN EL TIPO (Usando marcadores de colores de Leaflet)
-            let colorUrl = 'blue'; // Color por defecto
-            let colorHex = '#3388ff';
-
-            switch (reporte.tipo) {
-                case 'Obstáculo en vía':
-                    colorUrl = 'orange';
-                    colorHex = '#e67e22';
-                    break;
-                case 'Problema de Iluminación':
-                    colorUrl = 'gold';
-                    colorHex = '#f1c40f';
-                    break;
-                case 'Actividad Sospechosa':
-                    colorUrl = 'red';
-                    colorHex = '#e74c3c';
-                    break;
-                case 'Daño en Infraestructura':
-                    colorUrl = 'violet';
-                    colorHex = '#8e44ad';
-                    break;
-            }
-
-            // Crear un icono personalizado de marcador clásico con color
-            let pinIcono = new L.Icon({
-                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorUrl}.png`,
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-
-            // Pin clásico en el mapa con el color correspondiente
-            let marcador = L.marker([reporte.latitud, reporte.longitud], { icon: pinIcono }).addTo(mapa);
-            
+            // Pin en el mapa
+            let marcador = L.marker([reporte.latitud, reporte.longitud]).addTo(mapa);
             marcador.bindPopup(`
-                <b style="color: ${colorHex};">${reporte.tipo}</b><br>
+                <b style="color: #004d99;">${reporte.tipo}</b><br>
                 ${reporte.descripcion}<br>
                 <hr style="margin: 5px 0;">
                 <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
             `);
 
-            // Tarjeta en el dashboard con borde indicador de color
+            // --- Lógica para el estado de los votos ---
+            let textoEstado = "";
+            let claseEstado = "";
+            
+            if (reporte.likes > 0 || reporte.dislikes > 0) {
+                if (reporte.likes > reporte.dislikes) {
+                    textoEstado = "Reporte positivo";
+                    claseEstado = "estado-positivo";
+                } else if (reporte.dislikes > reporte.likes) {
+                    textoEstado = "Reporte negativo";
+                    claseEstado = "estado-negativo";
+                } else {
+                    textoEstado = "Reporte neutro";
+                    claseEstado = "estado-neutro";
+                }
+            }
+
+            // Tarjeta en el dashboard con botones
             let tarjeta = document.createElement('div');
             tarjeta.className = 'tarjeta-reporte';
-            tarjeta.style.borderLeft = `5px solid ${colorHex}`;
             tarjeta.innerHTML = `
                 <h4>${reporte.tipo}</h4>
                 <p>${reporte.descripcion}</p>
                 <small>Duración: ${reporte.duracion_horas} Hora(s)</small>
+                
+                <div class="seccion-votos">
+                    <button onclick="votar(${reporte.id}, 'like')" class="btn-voto">👍 ${reporte.likes}</button>
+                    <button onclick="votar(${reporte.id}, 'dislike')" class="btn-voto">👎 ${reporte.dislikes}</button>
+                    <span class="${claseEstado}">${textoEstado}</span>
+                </div>
             `;
             contenedorLista.appendChild(tarjeta);
         });
@@ -178,3 +165,22 @@ btnEnviar.addEventListener('click', async function() {
 
 // 6. Cargar los reportes al abrir la página
 cargarReportes();
+// 7. Función global para enviar el voto a la base de datos
+window.votar = async function(id, tipo) {
+    try {
+        await fetch(`/api/reportes/${id}/votar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: tipo })
+        });
+        
+        // Recargar pines y tarjetas para ver los números actualizados
+        mapa.eachLayer((layer) => {
+            if (!!layer.toGeoJSON) mapa.removeLayer(layer); 
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+        cargarReportes(); 
+    } catch (error) {
+        console.error("Error al enviar el voto:", error);
+    }
+};

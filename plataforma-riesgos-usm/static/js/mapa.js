@@ -100,6 +100,13 @@ btnEnviar.addEventListener('click', async function() {
         return;
     }
 
+    // NUEVO: Validador de máximo 250 palabras
+    const cantidadPalabras = desc.trim().split(/\s+/).length;
+    if (cantidadPalabras > 250) {
+        alert("La descripción es muy larga. El máximo permitido es de 250 palabras.");
+        return;
+    }
+
     // Armamos el paquete de datos para enviar a Python
     const nuevoReporte = {
         latitud: coordenadasSeleccionadas.lat,
@@ -133,5 +140,5 @@ btnEnviar.addEventListener('click', async function() {
     }
 });
 
-
+// 6. Cargar los reportes al abrir la página
 cargarReportes();

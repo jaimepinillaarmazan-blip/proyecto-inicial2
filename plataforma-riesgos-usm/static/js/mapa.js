@@ -26,12 +26,46 @@ async function cargarReportes() {
 
         // Dibujar cada reporte en el mapa y en el dashboard
         reportes.forEach(reporte => {
-            // Pin en el mapa
-            let marcador = L.marker([reporte.latitud, reporte.longitud]).addTo(mapa);
+            // 🎨 SELECCIONAR COLOR DEL PIN SEGÚN EL TIPO (Usando marcadores de colores de Leaflet)
+            let colorUrl = 'blue'; // Color por defecto
+            let colorHex = '#3388ff';
 
-            // Tarjeta en el dashboard
+            switch (reporte.tipo) {
+                case 'Obstáculo en vía':
+                    colorUrl = 'orange';
+                    colorHex = '#e67e22';
+                    break;
+                case 'Problema de Iluminación':
+                    colorUrl = 'gold';
+                    colorHex = '#f1c40f';
+                    break;
+                case 'Actividad Sospechosa':
+                    colorUrl = 'red';
+                    colorHex = '#e74c3c';
+                    break;
+                case 'Daño en Infraestructura':
+                    colorUrl = 'violet';
+                    colorHex = '#8e44ad';
+                    break;
+            }
+
+                    // Crear un icono personalizado de marcador clásico con color
+            let pinIcono = new L.Icon({
+                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorUrl}.png`,
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            // Pin clásico en el mapa con el color correspondiente
+            let marcador = L.marker([reporte.latitud, reporte.longitud], { icon: pinIcono }).addTo(mapa);
+
+            // Tarjeta en el dashboard con borde indicador de color
             let tarjeta = document.createElement('div');
             tarjeta.className = 'tarjeta-reporte';
+            tarjeta.style.borderLeft = `5px solid ${colorHex}`;
             tarjeta.innerHTML = `
                 <h4>${reporte.tipo}</h4>
                 <p>${reporte.descripcion}</p>
@@ -40,7 +74,7 @@ async function cargarReportes() {
             contenedorLista.appendChild(tarjeta);
 
             marcador.bindPopup(`
-                <b style="color: #004d99;">${reporte.tipo}</b><br>
+                <b style="color: ${colorHex};">${reporte.tipo}</b><br>
                 ${reporte.descripcion}<br>
                 <hr style="margin: 5px 0;">
                 <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
@@ -109,6 +143,13 @@ btnEnviar.addEventListener('click', async function() {
         return;
     }
 
+    // NUEVO: Validador de máximo 250 palabras
+    const cantidadPalabras = desc.trim().split(/\s+/).length;
+    if (cantidadPalabras > 250) {
+        alert("La descripción es muy larga. El máximo permitido es de 250 palabras.");
+        return;
+    }
+
     // Armamos el paquete de datos para enviar a Python
     const nuevoReporte = {
         latitud: coordenadasSeleccionadas.lat,
@@ -142,5 +183,5 @@ btnEnviar.addEventListener('click', async function() {
     }
 });
 
-
+// 6. Cargar los reportes al abrir la página
 cargarReportes();

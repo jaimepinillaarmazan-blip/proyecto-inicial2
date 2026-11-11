@@ -1,4 +1,3 @@
-/* Reset básico para que se vea igual en todos los navegadores */
 /* --- ESTILOS GENERALES --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -8,50 +7,87 @@ body {
     color: #f8fafc;
 }
 
-/* --- CABECERA (Estilo App) --- */
+/* --- CABECERA --- */
 header {
-    background: linear-gradient(135deg, #004d99, #002244); /* Degradado con el azul USM */
+    background: linear-gradient(135deg, #004d99, #002244);
     color: white;
     padding: 20px 15px;
     text-align: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 1.8em;
-    letter-spacing: 0.5px;
-}
+header h1 { margin: 0; font-size: 1.8em; letter-spacing: 0.5px; }
+header p { margin: 8px 0 0 0; font-size: 0.95em; color: #e0eaf5; }
 
-header p {
-    margin: 8px 0 0 0;
-    font-size: 0.95em;
-    color: #e0eaf5; /* Texto secundario ligeramente más claro */
-}
-
-/* --- CONTENEDOR PRINCIPAL --- */
-main {
+/* --- CONTENEDOR PRINCIPAL (Dos columnas) --- */
+.contenedor-principal {
     width: 95%;
-    max-width: 1000px;
-    margin: 30px auto; /* Centra el contenido y deja espacio con la cabecera */
+    max-width: 1400px;
+    margin: 30px auto;
+    display: flex;
+    flex-direction: row; /* Coloca mapa y panel lado a lado */
+    gap: 25px;
+    height: 75vh;
+}
+
+/* --- COLUMNA DEL MAPA --- */
+.columna-mapa {
+    flex: 2; /* El mapa ocupa el doble de espacio que el panel */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 25px;
 }
 
-/* --- MAPA --- */
 #mapa-usm {
     width: 100%;
-    height: 65vh; /* Ocupa el 65% de la altura de la pantalla */
-    border-radius: 12px; /* Esquinas redondeadas modernas */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra para efecto flotante */
-    border: 3px solid white; /* Borde blanco para enmarcar el mapa */
+    flex-grow: 1;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 3px solid white;
 }
 
-/* Agrega esto al final del archivo: */
-#btn-reportar {
-    background-color: #004d99; /* El mismo azul formal del título */
+/* --- PANEL LATERAL (Siempre visible) --- */
+#panel-reportes {
+    flex: 1;
+    background-color: #1e293b; /* Color oscuro acorde al fondo */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #334155;
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #004d99, #002244);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.panel-header h3 { margin: 0; font-size: 1.2em; }
+
+#lista-reportes {
+    padding: 20px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* Tarjetas de reportes */
+.tarjeta-reporte {
+    background-color: #0f172a;
+    border-left: 5px solid #004d99;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.tarjeta-reporte h4 { margin: 0 0 8px 0; color: #60a5fa; }
+.tarjeta-reporte p { margin: 0 0 10px 0; font-size: 0.9em; color: #e2e8f0; }
+.tarjeta-reporte small { color: #94a3b8; font-size: 0.8em; font-weight: bold; }
+
+/* --- BOTONES --- */
+.btn-principal {
+    background-color: #004d99;
     color: white;
     font-size: 1.1em;
     font-weight: bold;
@@ -63,102 +99,37 @@ main {
     transition: background-color 0.2s ease, transform 0.1s;
 }
 
-/* Efecto al pasar el cursor (Hover) */
-#btn-reportar:hover {
-    background-color: #003366; /* Un azul levemente más oscuro */
-    transform: translateY(-2px); /* Pequeño salto visual */
+.btn-principal:hover {
+    background-color: #003366;
+    transform: translateY(-2px);
 }
 
-/* --- ESTILOS DEL FORMULARIO EMERGENTE --- */
-#modal-reporte {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro semitransparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999; /* Asegura que flote sobre el mapa de Leaflet */
-}
-
-/* Clase para ocultar el modal con JavaScript */
-.oculto {
-    display: none !important;
-}
-
-/* Caja blanca central */
-.modal-contenido {
-    background-color: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.modal-contenido h2 { color: #004d99; text-align: center; font-size: 1.5em; }
-.modal-contenido label { font-weight: bold; font-size: 0.9em; color: #333; }
-.modal-contenido select, .modal-contenido textarea {
-    width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;
-}
-
-.modal-botones { display: flex; justify-content: space-between; margin-top: 10px; }
-.btn-principal { background-color: #004d99; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-secundario { background-color: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-principal:hover { background-color: #003366; }
 .btn-secundario:hover { background-color: #bbb; }
-/* --- DASHBOARD LATERAL --- */
-#dashboard-lateral {
-    position: fixed;
-    top: 0;
-    right: -400px; /* Empieza oculto fuera de la pantalla */
-    width: 350px;
-    max-width: 100%;
-    height: 100vh;
-    background-color: white;
-    box-shadow: -4px 0 15px rgba(0,0,0,0.3);
-    transition: right 0.3s ease; /* Animación de deslizamiento */
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
+
+/* --- FORMULARIO EMERGENTE --- */
+#modal-reporte {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
 }
 
-#dashboard-lateral.abierto {
-    right: 0; /* Al agregar esta clase con JS, el panel entra a la pantalla */
-}
+.oculto { display: none !important; }
 
-.dashboard-header {
-    background: linear-gradient(135deg, #004d99, #002244);
+.modal-contenido {
+    background-color: #1e293b;
+    padding: 25px; border-radius: 12px;
+    width: 90%; max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column; gap: 15px;
     color: white;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
-.dashboard-header h3 { margin: 0; font-size: 1.2em; }
-#btn-cerrar-dashboard { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; }
-
-#lista-reportes {
-    padding: 20px;
-    overflow-y: auto; /* Permite hacer scroll si hay muchos reportes */
-    flex-grow: 1;
+.modal-contenido h2 { color: #60a5fa; text-align: center; font-size: 1.5em; margin: 0; }
+.modal-contenido label { font-weight: bold; font-size: 0.9em; }
+.modal-contenido select, .modal-contenido textarea {
+    width: 100%; padding: 10px; border: 1px solid #475569; border-radius: 6px; font-family: inherit;
+    background-color: #0f172a; color: white; box-sizing: border-box;
 }
-
-/* Diseño de cada reporte en la lista */
-.tarjeta-reporte {
-    background-color: #f8fafc;
-    border-left: 5px solid #004d99;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.tarjeta-reporte h4 { margin: 0 0 8px 0; color: #004d99; }
-.tarjeta-reporte p { margin: 0 0 10px 0; font-size: 0.9em; color: #333; }
-.tarjeta-reporte small { color: #666; font-size: 0.8em; font-weight: bold; }
+.modal-botones { display: flex; justify-content: space-between; margin-top: 10px; }

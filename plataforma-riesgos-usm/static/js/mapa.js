@@ -126,15 +126,3 @@ btnEnviar.addEventListener('click', async function() {
 
 
 cargarReportes();
-// 6. Lógica del Dashboard Lateral
-const dashboard = document.getElementById('dashboard-lateral');
-const btnAbrirDashboard = document.getElementById('btn-abrir-dashboard');
-const btnCerrarDashboard = document.getElementById('btn-cerrar-dashboard');
-
-btnAbrirDashboard.addEventListener('click', () => {
-    dashboard.classList.add('abierto');
-});
-
-btnCerrarDashboard.addEventListener('click', () => {
-    dashboard.classList.remove('abierto');
-});

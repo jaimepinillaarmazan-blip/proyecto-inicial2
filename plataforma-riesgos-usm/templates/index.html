@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alertas Tempranas - USM</title>
     
-    <!-- Cargamos los estilos de Leaflet para el mapa -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Conectamos nuestro propio archivo de estilos -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
 </head>
 <body>
@@ -18,29 +15,29 @@
         <p>Reporta y visualiza obstáculos o incidentes en los alrededores de la universidad.</p>
     </header>
 
-    <main>
-        <!-- Este es el contenedor donde aparecerá el mapa interactivo -->
-        <div id="mapa-usm"></div>
+    <main class="contenedor-principal">
         
-        <!-- Botones debajo del mapa -->
-        <div style="display: flex; gap: 15px; margin-top: 10px;">
-            <button id="btn-reportar" class="btn-principal">Reportar Nuevo Incidente</button>
-            <button id="btn-abrir-dashboard" class="btn-secundario">Ver Últimos 25 Reportes</button>
+        <!-- Columna Izquierda: Mapa interactivo y Botón -->
+        <div class="columna-mapa">
+            <div id="mapa-usm"></div>
+            <div style="margin-top: 15px; text-align: center;">
+                <button id="btn-reportar" class="btn-principal">Reportar Nuevo Incidente</button>
+            </div>
         </div>
+
+        <!-- Columna Derecha: Panel siempre visible -->
+        <aside id="panel-reportes">
+            <div class="panel-header">
+                <h3>Últimos Reportes</h3>
+            </div>
+            <div id="lista-reportes">
+                <!-- JavaScript inyectará las tarjetas de reportes aquí -->
+            </div>
+        </aside>
+
     </main>
 
-    <!-- Dashboard Lateral Desplegable -->
-    <div id="dashboard-lateral">
-        <div class="dashboard-header">
-            <h3>Últimos Reportes</h3>
-            <button id="btn-cerrar-dashboard">✖</button>
-        </div>
-        <div id="lista-reportes">
-            <!-- JavaScript inyectará las tarjetas de reportes aquí -->
-        </div>
-    </div>
-
-    <!-- Contenedor del formulario emergente (Debe ir ANTES de los scripts) -->
+    <!-- Contenedor del formulario emergente -->
     <div id="modal-reporte" class="oculto">
         <div class="modal-contenido">
             <h2>Detalles del Incidente</h2>
@@ -71,10 +68,7 @@
         </div>
     </div>
 
-    <!-- Cargamos la lógica de Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Conectamos nuestro propio archivo JavaScript al final -->
     <script src="{{ url_for('static', filename='js/mapa.js') }}"></script>
 
 </body>

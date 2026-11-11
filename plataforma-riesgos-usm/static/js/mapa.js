@@ -16,69 +16,80 @@ var marcadorTemporal = null;
 var coordenadasSeleccionadas = null;
 
 // 3. Función para descargar los reportes de SQLite y dibujarlos
+// 3. Función para descargar los reportes de SQLite y dibujarlos
 async function cargarReportes() {
     try {
         const respuesta = await fetch('/api/reportes');
         const reportes = await respuesta.json();
 
         const contenedorLista = document.getElementById('lista-reportes');
-        contenedorLista.innerHTML = ''; // Limpiamos la lista antes de actualizar
+        contenedorLista.innerHTML = ''; 
 
-        // Dibujar cada reporte en el mapa y en el dashboard
+        // Leer los votos guardados en el navegador para saber si ya votó
+        let votosGuardados = JSON.parse(localStorage.getItem('votos_usm')) || [];
+
         reportes.forEach(reporte => {
-            // 🎨 SELECCIONAR COLOR DEL PIN SEGÚN EL TIPO (Usando marcadores de colores de Leaflet)
-            let colorUrl = 'blue'; // Color por defecto
+            
+            // 🎨 SELECCIONAR COLOR DEL PIN SEGÚN EL TIPO
+            let colorUrl = 'blue'; 
             let colorHex = '#3388ff';
 
             switch (reporte.tipo) {
-                case 'Obstáculo en vía':
-                    colorUrl = 'orange';
-                    colorHex = '#e67e22';
-                    break;
-                case 'Problema de Iluminación':
-                    colorUrl = 'gold';
-                    colorHex = '#f1c40f';
-                    break;
-                case 'Actividad Sospechosa':
-                    colorUrl = 'red';
-                    colorHex = '#e74c3c';
-                    break;
-                case 'Daño en Infraestructura':
-                    colorUrl = 'violet';
-                    colorHex = '#8e44ad';
-                    break;
+                case 'Obstáculo en vía': colorUrl = 'orange'; colorHex = '#e67e22'; break;
+                case 'Problema de Iluminación': colorUrl = 'gold'; colorHex = '#f1c40f'; break;
+                case 'Actividad Sospechosa': colorUrl = 'red'; colorHex = '#e74c3c'; break;
+                case 'Daño en Infraestructura': colorUrl = 'violet'; colorHex = '#8e44ad'; break;
             }
 
-                    // Crear un icono personalizado de marcador clásico con color
             let pinIcono = new L.Icon({
                 iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${colorUrl}.png`,
                 shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
             });
 
-            // Pin clásico en el mapa con el color correspondiente
             let marcador = L.marker([reporte.latitud, reporte.longitud], { icon: pinIcono }).addTo(mapa);
-
-            // Tarjeta en el dashboard con borde indicador de color
-            let tarjeta = document.createElement('div');
-            tarjeta.className = 'tarjeta-reporte';
-            tarjeta.style.borderLeft = `5px solid ${colorHex}`;
-            tarjeta.innerHTML = `
-                <h4>${reporte.tipo}</h4>
-                <p>${reporte.descripcion}</p>
-                <small>Duración: ${reporte.duracion_horas} Hora(s)</small>
-            `;
-            contenedorLista.appendChild(tarjeta);
-
+            
             marcador.bindPopup(`
                 <b style="color: ${colorHex};">${reporte.tipo}</b><br>
                 ${reporte.descripcion}<br>
                 <hr style="margin: 5px 0;">
                 <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
             `);
+
+            // --- Lógica para el estado de los votos ---
+            let textoEstado = "";
+            let claseEstado = "";
+            
+            if (reporte.likes > 0 || reporte.dislikes > 0) {
+                if (reporte.likes > reporte.dislikes) {
+                    textoEstado = "Reporte positivo"; claseEstado = "estado-positivo";
+                } else if (reporte.dislikes > reporte.likes) {
+                    textoEstado = "Reporte negativo"; claseEstado = "estado-negativo";
+                } else {
+                    textoEstado = "Reporte neutro"; claseEstado = "estado-neutro";
+                }
+            }
+
+            // Verificamos si este reporte en particular ya fue votado por el usuario
+            let yaVoto = votosGuardados.includes(reporte.id);
+            let atributoDeshabilitado = yaVoto ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : '';
+
+            // Tarjeta en el dashboard con borde indicador de color y botones
+            let tarjeta = document.createElement('div');
+            tarjeta.className = 'tarjeta-reporte';
+            tarjeta.style.borderLeft = `5px solid ${colorHex}`;
+            tarjeta.innerHTML = `
+                <h4 style="color: ${colorHex};">${reporte.tipo}</h4>
+                <p>${reporte.descripcion}</p>
+                <small>Duración: ${reporte.duracion_horas} Hora(s)</small>
+                
+                <div class="seccion-votos">
+                    <button onclick="votar(${reporte.id}, 'like')" class="btn-voto" ${atributoDeshabilitado}>👍 ${reporte.likes}</button>
+                    <button onclick="votar(${reporte.id}, 'dislike')" class="btn-voto" ${atributoDeshabilitado}>👎 ${reporte.dislikes}</button>
+                    <span class="${claseEstado}">${textoEstado}</span>
+                </div>
+            `;
+            contenedorLista.appendChild(tarjeta);
         });
     } catch (error) {
         console.error("Error al cargar los reportes:", error);
@@ -185,8 +196,17 @@ btnEnviar.addEventListener('click', async function() {
 
 // 6. Cargar los reportes al abrir la página
 cargarReportes();
-// 7. Función global para enviar el voto a la base de datos
+// 7. Función global para enviar el voto y bloquear múltiples intentos
 window.votar = async function(id, tipo) {
+    // Revisamos la memoria del navegador
+    let votosGuardados = JSON.parse(localStorage.getItem('votos_usm')) || [];
+    
+    // Si el ID del reporte ya está guardado, detenemos el proceso
+    if (votosGuardados.includes(id)) {
+        alert("Ya has calificado este reporte anteriormente.");
+        return;
+    }
+
     try {
         await fetch(`/api/reportes/${id}/votar`, {
             method: 'POST',
@@ -194,7 +214,11 @@ window.votar = async function(id, tipo) {
             body: JSON.stringify({ tipo: tipo })
         });
         
-        // Recargar pines y tarjetas para ver los números actualizados
+        // Guardamos el ID del reporte en la memoria del navegador
+        votosGuardados.push(id);
+        localStorage.setItem('votos_usm', JSON.stringify(votosGuardados));
+        
+        // Recargar pines y tarjetas
         mapa.eachLayer((layer) => {
             if (!!layer.toGeoJSON) mapa.removeLayer(layer); 
         });

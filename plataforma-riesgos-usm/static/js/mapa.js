@@ -185,3 +185,22 @@ btnEnviar.addEventListener('click', async function() {
 
 // 6. Cargar los reportes al abrir la página
 cargarReportes();
+// 7. Función global para enviar el voto a la base de datos
+window.votar = async function(id, tipo) {
+    try {
+        await fetch(`/api/reportes/${id}/votar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: tipo })
+        });
+        
+        // Recargar pines y tarjetas para ver los números actualizados
+        mapa.eachLayer((layer) => {
+            if (!!layer.toGeoJSON) mapa.removeLayer(layer); 
+        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapa);
+        cargarReportes(); 
+    } catch (error) {
+        console.error("Error al enviar el voto:", error);
+    }
+};

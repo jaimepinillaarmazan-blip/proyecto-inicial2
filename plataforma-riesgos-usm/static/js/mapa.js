@@ -1,5 +1,9 @@
-// 1. Inicializar el mapa centrado en la Casa Central de la USM
-var mapa = L.map('mapa-usm').setView([-33.0348, -71.5965], 16);
+// 1. Limitar el mapa al área visible al alejarlo al máximo
+var centroMapa = [-33.0348, -71.5965];
+var mapa = L.map('mapa-usm', { minZoom: 14, maxBoundsViscosity: 1.0 }).setView(centroMapa, 14);
+var areaPermitida = mapa.getBounds();
+mapa.setMaxBounds(areaPermitida);
+mapa.setView(centroMapa, 16);
 
 // 2. Cargar la capa visual de OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -48,6 +52,11 @@ async function cargarReportes() {
 
 // 4. Permitir al usuario hacer clic en el mapa para seleccionar la ubicación del incidente
 mapa.on('click', function(e) {
+    if (!areaPermitida.contains(e.latlng)) {
+        alert("Solo puedes colocar reportes dentro del área inicial del mapa.");
+        return;
+    }
+
     coordenadasSeleccionadas = e.latlng; // Guardamos las coordenadas exactas
     
     // Borramos el pin anterior si el usuario hace clic en otro lado

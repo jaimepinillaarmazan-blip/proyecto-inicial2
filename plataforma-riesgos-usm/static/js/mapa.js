@@ -28,12 +28,6 @@ async function cargarReportes() {
         reportes.forEach(reporte => {
             // Pin en el mapa
             let marcador = L.marker([reporte.latitud, reporte.longitud]).addTo(mapa);
-            marcador.bindPopup(`
-                <b style="color: #004d99;">${reporte.tipo}</b><br>
-                ${reporte.descripcion}<br>
-                <hr style="margin: 5px 0;">
-                <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
-            `);
 
             // Tarjeta en el dashboard
             let tarjeta = document.createElement('div');
@@ -44,6 +38,13 @@ async function cargarReportes() {
                 <small>Duración: ${reporte.duracion_horas} Hora(s)</small>
             `;
             contenedorLista.appendChild(tarjeta);
+
+            marcador.bindPopup(`
+                <b style="color: #004d99;">${reporte.tipo}</b><br>
+                ${reporte.descripcion}<br>
+                <hr style="margin: 5px 0;">
+                <small>🕒 Desaparece en: ${reporte.duracion_horas} hora(s)</small>
+            `);
         });
     } catch (error) {
         console.error("Error al cargar los reportes:", error);
@@ -57,16 +58,23 @@ mapa.on('click', function(e) {
         return;
     }
 
-    coordenadasSeleccionadas = e.latlng; // Guardamos las coordenadas exactas
-    
     // Borramos el pin anterior si el usuario hace clic en otro lado
     if (marcadorTemporal) {
         mapa.removeLayer(marcadorTemporal);
     }
     
     // Ponemos un pin nuevo donde hizo clic
+    coordenadasSeleccionadas = e.latlng; // Guardamos las coordenadas exactas
     marcadorTemporal = L.marker(coordenadasSeleccionadas).addTo(mapa);
     marcadorTemporal.bindPopup("<b>Ubicación seleccionada</b><br>Presiona el botón azul abajo para reportar un incidente aquí.").openPopup();
+    const marcadorSeleccionado = marcadorTemporal;
+    marcadorSeleccionado.on('popupclose', function() {
+        mapa.removeLayer(marcadorSeleccionado);
+        if (marcadorTemporal === marcadorSeleccionado) {
+            marcadorTemporal = null;
+            coordenadasSeleccionadas = null;
+        }
+    });
 });
 
 // 5. Configurar los botones y el formulario emergente
@@ -87,6 +95,7 @@ btnReportar.addEventListener('click', function() {
 // Al presionar "Cancelar"
 btnCancelar.addEventListener('click', function() {
     modal.classList.add('oculto'); // Oculta el formulario
+    document.getElementById('desc-incidente').value = "";
 });
 
 // Al presionar "Guardar Reporte" (Enviar datos a la Base de Datos)
